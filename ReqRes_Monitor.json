@@ -1,0 +1,71 @@
+{
+  "info": {
+    "_postman_id": "997a13cc-0ab7-4bf0-85bb-8f9b0bb30bad",
+    "name": "2474802010341_BuiDucTai_ReqRes_Monitor",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "GET - Users page 1 (Monitor)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Availability: Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"SLA: Response time is below 800ms\", function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(800);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/users?page=1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "users"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "1"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Gan API key (reqres.in yeu cau) neu da khai bao trong Environment",
+          "const apiKey = pm.environment.get(\"apiKey\");",
+          "if (apiKey) {",
+          "    pm.request.headers.upsert({ key: \"x-api-key\", value: apiKey });",
+          "}",
+          "",
+          "// Log du lieu DDT cua iteration hien tai (neu co)",
+          "const name = pm.iterationData.get(\"name\");",
+          "if (name) {",
+          "    console.log(\"Iteration \" + (pm.info.iteration + 1) + \"/\" + pm.info.iterationCount + \" -> \" + name + \" / \" + pm.iterationData.get(\"job\"));",
+          "}"
+        ]
+      }
+    }
+  ]
+}
