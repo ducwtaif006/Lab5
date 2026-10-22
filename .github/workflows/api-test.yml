@@ -1,0 +1,39 @@
+name: Automated API tests using Newman
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  automated-api-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Newman and HTML Extra Reporter
+        run: |
+          npm install -g newman newman-reporter-htmlextra
+
+      - name: Run API tests via Newman
+        run: |
+          newman run "ReqRes_Collection.json" \
+            -e "ReqRes_Environment.json..json" \
+            -d users.csv \
+            --delay-request 500 \
+            --env-var "apiKey=${{ secrets.REQRES_API_KEY }}" \
+            --reporters cli,htmlextra \
+            --reporter-htmlextra-export report.html
+
+      - name: Upload HTML Test Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: postman-html-report
+          path: report.html
