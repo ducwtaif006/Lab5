@@ -1,0 +1,36 @@
+name: API Monitor (Shift-Right)
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Newman and HTML Extra Reporter
+        run: npm install -g newman newman-reporter-htmlextra
+
+      - name: Check availability and response time (< 800ms)
+        run: |
+          newman run "ReqRes_Monitor.json" \
+            --env-var "baseUrl=https://reqres.in" \
+            --env-var "apiKey=${{ secrets.REQRES_API_KEY }}" \
+            --reporters cli,htmlextra \
+            --reporter-htmlextra-export monitor-report.html
+
+      - name: Upload monitor report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: monitor-report
+          path: monitor-report.html
