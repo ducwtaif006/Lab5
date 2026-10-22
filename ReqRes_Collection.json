@@ -1,10 +1,8 @@
 {
   "info": {
-    "_postman_id": "005483a0-acc2-4b44-b510-75957bd2910f",
+    "_postman_id": "777f1432-c505-48d3-aaa4-f7b156bf6a0d",
     "name": "2474802010341_BuiDucTai_ReqRes",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "59053121",
-    "_collection_link": "https://go.postman.co/collection/59053121-005483a0-acc2-4b44-b510-75957bd2910f?source=collection_link"
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
@@ -18,38 +16,32 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));\r\n\r\npm.test(\"Token exists\", () => {\r\n    pm.expect(pm.response.json()).to.have.property(\"token\");\r\n});\r\n\r\npm.environment.set(\"userToken\", pm.response.json().token);"
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Token exists\", function () {",
+                  "    pm.expect(pm.response.json()).to.have.property(\"token\");",
+                  "});",
+                  "",
+                  "// Luu token vao bien moi truong userToken",
+                  "const body = pm.response.json();",
+                  "if (body.token) {",
+                  "    pm.environment.set(\"userToken\", body.token);",
+                  "}"
                 ]
               }
             }
           ],
           "request": {
-            "auth": {
-              "type": "apikey",
-              "apikey": [
-                {
-                  "key": "key",
-                  "value": "x-api-key",
-                  "type": "string"
-                },
-                {
-                  "key": "value",
-                  "value": "{{apikey}}",
-                  "type": "string"
-                }
-              ]
-            },
             "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n \"email\": \"eve.holt@reqres.in\",\r\n \"password\": \"pistol\"\r\n}\r\n",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
               }
-            },
+            ],
             "url": {
               "raw": "{{baseUrl}}/api/register",
               "host": [
@@ -59,6 +51,15 @@
                 "api",
                 "register"
               ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"eve.holt@reqres.in\",\n  \"password\": \"pistol\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           },
           "response": []
@@ -71,7 +72,35 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status code is 201\", () => pm.response.to.have.status(201));\r\n\r\nconst res = pm.response.json();\r\n\r\npm.test(\"name khớp dữ liệu CSV\", () => {\r\n    pm.expect(res.name).to.eql(pm.iterationData.get(\"name\"));\r\n});\r\n\r\npm.test(\"job khớp dữ liệu CSV\", () => {\r\n    pm.expect(res.job).to.eql(pm.iterationData.get(\"job\"));\r\n});\r\n\r\npm.environment.set(\"userId\", res.id);"
+                  "// Du lieu cua iteration hien tai lay tu users.csv",
+                  "const expectedName = pm.iterationData.get(\"name\");",
+                  "const expectedJob  = pm.iterationData.get(\"job\");",
+                  "",
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Da nap du lieu tu users.csv\", function () {",
+                  "    pm.expect(expectedName, \"Chua chon file users.csv trong Runner\").to.not.be.undefined;",
+                  "    pm.expect(expectedJob, \"Chua chon file users.csv trong Runner\").to.not.be.undefined;",
+                  "});",
+                  "",
+                  "pm.test(\"Response co name va job\", function () {",
+                  "    const res = pm.response.json();",
+                  "    pm.expect(res).to.have.property(\"name\");",
+                  "    pm.expect(res).to.have.property(\"job\");",
+                  "});",
+                  "",
+                  "pm.test(\"name khop du lieu CSV\", function () {",
+                  "    pm.expect(pm.response.json().name).to.eql(expectedName);",
+                  "});",
+                  "",
+                  "pm.test(\"job khop du lieu CSV\", function () {",
+                  "    pm.expect(pm.response.json().job).to.eql(expectedJob);",
+                  "});",
+                  "",
+                  "// Luu id de PUT va DELETE dung o cac request sau",
+                  "pm.environment.set(\"userId\", pm.response.json().id);"
                 ]
               }
             }
@@ -80,26 +109,16 @@
             "method": "POST",
             "header": [
               {
-                "key": "Authorization",
-                "value": "Bearer {{userToken}}"
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
               },
               {
-                "key": "x-api-key",
-                "value": "{{apikey}}"
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "type": "text"
               }
             ],
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "file\n",
-                  "type": "file",
-                  "src": [
-                    "19KJQHzjO/users.csv"
-                  ]
-                }
-              ]
-            },
             "url": {
               "raw": "{{baseUrl}}/api/users",
               "host": [
@@ -109,6 +128,15 @@
                 "api",
                 "users"
               ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{name}}\",\n  \"job\": \"{{job}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           },
           "response": []
@@ -121,19 +149,24 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\npm.test(\"data.id equals 2\", function () {\r\n    pm.expect(pm.response.json().data.id).to.eql(2);\r\n});\r\npm.test(\"data.email ends with @reqres.in\", function () {\r\n    pm.expect(pm.response.json().data.email).to.include(\"@reqres.in\");\r\n});"
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"data.id equals 2\", function () {",
+                  "    pm.expect(pm.response.json().data.id).to.eql(2);",
+                  "});",
+                  "",
+                  "pm.test(\"data.email ends with @reqres.in\", function () {",
+                  "    pm.expect(pm.response.json().data.email).to.include(\"@reqres.in\");",
+                  "});"
                 ]
               }
             }
           ],
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "x-api-key",
-                "value": "{{apikey}}"
-              }
-            ],
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/users/2",
               "host": [
@@ -156,7 +189,13 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\npm.test(\"updatedAt exists\", function () {\r\n    pm.expect(pm.response.json()).to.have.property(\"updatedAt\");\r\n});"
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"updatedAt exists in response body\", function () {",
+                  "    pm.expect(pm.response.json()).to.have.property(\"updatedAt\");",
+                  "});"
                 ]
               }
             }
@@ -165,19 +204,11 @@
             "method": "PUT",
             "header": [
               {
-                "key": "x-api-key",
-                "value": "{{apikey}}"
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
               }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n \"name\": \"An Nguyen Updated\",\r\n \"job\": \"QA Manager\"\r\n}\r\n",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
             "url": {
               "raw": "{{baseUrl}}/api/users/{{userId}}",
               "host": [
@@ -188,6 +219,15 @@
                 "users",
                 "{{userId}}"
               ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"An Nguyen Updated\",\n  \"job\": \"QA Manager\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           },
           "response": []
@@ -200,7 +240,9 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status code is 204\", function () {\r\n    pm.response.to.have.status(204);\r\n});"
+                  "pm.test(\"Status code is 204 (No Content)\", function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
                 ]
               }
             }
@@ -235,7 +277,13 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status code is 400\", () => pm.response.to.have.status(400));\r\n\r\npm.test(\"Thông báo lỗi là Missing password\", () => {\r\n    pm.expect(pm.response.json().error).to.eql(\"Missing password\");\r\n});"
+                  "pm.test(\"Status code is 400 (Bad Request)\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"error is \\\"Missing password\\\"\", function () {",
+                  "    pm.expect(pm.response.json().error).to.eql(\"Missing password\");",
+                  "});"
                 ]
               }
             }
@@ -244,20 +292,11 @@
             "method": "POST",
             "header": [
               {
-                "key": "x-api-key",
-                "value": "{{apikey}}",
-                "disabled": true
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
               }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n  \"email\": \"sydney@fife\"\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
             "url": {
               "raw": "{{baseUrl}}/api/register",
               "host": [
@@ -267,6 +306,15 @@
                 "api",
                 "register"
               ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"sydney@fife\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           },
           "response": []
@@ -279,23 +327,26 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status code is 400\", function () {\r\n    pm.response.to.have.status(400);\r\n});\r\npm.test(\"error is Missing email or username\", function () {\r\n    pm.expect(pm.response.json().error).to.eql(\"Missing email or username\");\r\n});"
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"error is \\\"Missing email or username\\\"\", function () {",
+                  "    pm.expect(pm.response.json().error).to.eql(\"Missing email or username\");",
+                  "});"
                 ]
               }
             }
           ],
           "request": {
             "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
               }
-            },
+            ],
             "url": {
               "raw": "{{baseUrl}}/api/login",
               "host": [
@@ -305,6 +356,15 @@
                 "api",
                 "login"
               ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           },
           "response": []
@@ -317,7 +377,13 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status code is 404\", function () {\r\n    pm.response.to.have.status(404);\r\n});\r\npm.test(\"Body is empty object\", function () {\r\n    pm.expect(pm.response.json()).to.eql({});\r\n});"
+                  "pm.test(\"Status code is 404 (Not Found)\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body is an empty object {}\", function () {",
+                  "    pm.expect(pm.response.json()).to.eql({});",
+                  "});"
                 ]
               }
             }
@@ -342,19 +408,25 @@
       ]
     }
   ],
-  "auth": {
-    "type": "apikey",
-    "apikey": [
-      {
-        "key": "key",
-        "value": "x-api-key",
-        "type": "string"
-      },
-      {
-        "key": "value",
-        "value": "{{apikey}}",
-        "type": "string"
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Gan API key (reqres.in yeu cau) neu da khai bao trong Environment",
+          "const apiKey = pm.environment.get(\"apiKey\");",
+          "if (apiKey) {",
+          "    pm.request.headers.upsert({ key: \"x-api-key\", value: apiKey });",
+          "}",
+          "",
+          "// Log du lieu DDT cua iteration hien tai (neu co)",
+          "const name = pm.iterationData.get(\"name\");",
+          "if (name) {",
+          "    console.log(\"Iteration \" + (pm.info.iteration + 1) + \"/\" + pm.info.iterationCount + \" -> \" + name + \" / \" + pm.iterationData.get(\"job\"));",
+          "}"
+        ]
       }
-    ]
-  }
+    }
+  ]
 }
